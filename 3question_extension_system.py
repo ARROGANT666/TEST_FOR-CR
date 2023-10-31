@@ -2,16 +2,10 @@
 import streamlit as st
 import pandas as pd
 import joblib
-import nltk
 import re
-from nltk.tokenize import word_tokenize
-from nltk.text import Text
-from nltk import pos_tag
-from nltk.corpus import stopwords
 import translators as ts
 from multiprocessing import Pool
 from tqdm import *
-from nltk.corpus import wordnet as wn
 import numpy as np
 
 def syn_wordnet(word):
