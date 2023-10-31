@@ -1,0 +1,928 @@
+,Answer_Score,Answer_Body,Answer_CommentCount,Id,CreationDate,Score,Body,CommentCount,AcceptedAnswerId,ViewCount,Title,Tags,AnswerCount,FavoriteCount,dect_title_que
+0,522,"an explicit cast to double like this isn't necessary:
+
+double trans = (double) trackbar1.value / 5000.0;
+
+
+identifying the constant as 5000.0 (or as 5000d) is sufficient:
+
+double trans = trackbar1.value / 5000.0;
+double trans = trackbar1.value / 5000d;
+
+",1,4,2008-07-31T21:42:52.667,794,"<p>I want to assign the decimal variable ""trans"" to the double variable ""this.Opacity"".</p>
+<pre class=""lang-cs prettyprint-override""><code>decimal trans = trackBar1.Value / 5000;
+this.Opacity = trans;
+</code></pre>
+<p>When I build the app it gives the following error:</p>
+<blockquote>
+<p>Cannot implicitly convert type decimal to double</p>
+</blockquote>
+",8,7.0,70633,How to convert Decimal to Double in C#?,<c#><floating-point><type-conversion><double><decimal>,14,0.0,Question
+1,160,"the parent div needs to have a defined width, either in pixels or as a percentage. in internet&nbsp;explorer&nbsp;7, the parent div needs a defined width for child percentage divs to work correctly.
+",0,6,2008-07-31T22:08:08.620,319,"<p>I have an absolutely positioned <code>div</code> containing several children, one of which is a relatively positioned <code>div</code>. When I use a <code>percentage-based width</code> on the child <code>div</code>, it collapses to <code>0 width</code> on IE7, but not on Firefox or Safari.</p>
+<p>If I use <code>pixel width</code>, it works. If the parent is relatively positioned, the percentage width on the child works.</p>
+<ol>
+<li>Is there something I'm missing here?</li>
+<li>Is there an easy fix for this besides the <code>pixel-based width</code> on the child?</li>
+<li>Is there an area of the CSS specification that covers this?</li>
+</ol>
+",0,31.0,23465,Why did the width collapse in the percentage width child element in an absolutely positioned parent on Internet Explorer 7?,<html><css><internet-explorer-7>,7,0.0,Question
+2,2385,"an easy to understand and simple solution.
+// save today's date.
+var today = datetime.today;
+
+// calculate the age.
+var age = today.year - birthdate.year;
+
+// go back to the year in which the person was born in case of a leap year
+if (birthdate.date > today.addyears(-age)) age--;
+
+however, this assumes you are looking for the western idea of the age and not using east asian reckoning.
+",8,9,2008-07-31T23:40:59.743,2199,"<p>Given a <code>DateTime</code> representing a person's birthday, how do I calculate their age in years?</p>
+",10,1404.0,784860,How do I calculate someone's age based on a DateTime type birthday?,<c#><.net><datetime>,74,0.0,Question
+3,222,"the monte carlo method, as mentioned, applies some great concepts but it is, clearly, not the fastest, not by a long shot, not by any reasonable measure. also, it all depends on what kind of accuracy you are looking for. the fastest π i know of is the one with the digits hard coded. looking at pi and pi[pdf], there are a lot of formulae.
+
+here is a method that converges quickly — about 14 digits per iteration. pifast, the current fastest application, uses this formula with the fft. i'll just write the formula, since the code is straightforward. this formula was almost found by ramanujan and discovered by chudnovsky. it is actually how he calculated several billion digits of the number — so it isn't a method to disregard. the formula will overflow quickly and, since we are dividing factorials, it would be advantageous then to delay such calculations to remove terms.
+
+
+
+
+
+where,
+
+
+
+below is the brent–salamin algorithm. wikipedia mentions that when a and b are ""close enough"" then (a + b)² / 4t will be an approximation of π. i'm not sure what ""close enough"" means, but from my tests, one iteration got 2 digits, two got 7, and three had 15, of course this is with doubles, so it might have an error based on its representation and the true calculation could be more accurate.
+
+let pi_2 iters =
+    let rec loop_ a b t p i =
+        if i = 0 then a,b,t,p
+        else
+            let a_n = (a +. b) /. 2.0 
+            and b_n = sqrt (a*.b)
+            and p_n = 2.0 *. p in
+            let t_n = t -. (p *. (a -. a_n) *. (a -. a_n)) in
+            loop_ a_n b_n t_n p_n (i - 1)
+    in 
+    let a,b,t,p = loop_ (1.0) (1.0 /. (sqrt 2.0)) (1.0/.4.0) (1.0) iters in
+    (a +. b) *. (a +. b) /. (4.0 *. t)
+
+
+lastly, how about some pi golf (800 digits)? 160 characters!
+
+int a=10000,b,c=2800,d,e,f[2801],g;main(){for(;b-c;)f[b++]=a/5;for(;d=0,g=c*2;c-=14,printf(""%.4d"",e+d/a),e=d%a)for(b=c;d+=f[b]*a,f[b]=d%--g,d/=g--,--b;d*=b);}
+
+",2,19,2008-08-01T05:21:22.257,351,"<p>I'm looking for the fastest way to obtain the value of π, as a personal challenge. More specifically, I'm using ways that don't involve using <code>#define</code> constants like <code>M_PI</code>, or hard-coding the number in.</p>
+
+<p>The program below tests the various ways I know of. The inline assembly version is, in theory, the fastest option, though clearly not portable. I've included it as a baseline to compare against the other versions. In my tests, with built-ins, the <code>4 * atan(1)</code> version is fastest on GCC 4.2, because it auto-folds the <code>atan(1)</code> into a constant. With <code>-fno-builtin</code> specified, the <code>atan2(0, -1)</code> version is fastest.</p>
+
+<p>Here's the main testing program (<code>pitimes.c</code>):</p>
+
+<pre class=""lang-c prettyprint-override""><code>#include <math.h>
+#include <stdio.h>
+#include <time.h>
+
+#define ITERS 10000000
+#define TESTWITH(x) {                                                       \
+    diff = 0.0;                                                             \
+    time1 = clock();                                                        \
+    for (i = 0; i < ITERS; ++i)                                             \
+        diff += (x) - M_PI;                                                 \
+    time2 = clock();                                                        \
+    printf(""%s\t=> %e, time => %f\n"", #x, diff, diffclock(time2, time1));   \
+}
+
+static inline double
+diffclock(clock_t time1, clock_t time0)
+{
+    return (double) (time1 - time0) / CLOCKS_PER_SEC;
+}
+
+int
+main()
+{
+    int i;
+    clock_t time1, time2;
+    double diff;
+
+    /* Warmup. The atan2 case catches GCC's atan folding (which would
+     * optimise the ``4 * atan(1) - M_PI'' to a no-op), if -fno-builtin
+     * is not used. */
+    TESTWITH(4 * atan(1))
+    TESTWITH(4 * atan2(1, 1))
+
+#if defined(__GNUC__) && (defined(__i386__) || defined(__amd64__))
+    extern double fldpi();
+    TESTWITH(fldpi())
+#endif
+
+    /* Actual tests start here. */
+    TESTWITH(atan2(0, -1))
+    TESTWITH(acos(-1))
+    TESTWITH(2 * asin(1))
+    TESTWITH(4 * atan2(1, 1))
+    TESTWITH(4 * atan(1))
+
+    return 0;
+}
+</code></pre>
+
+<p>And the inline assembly stuff (<code>fldpi.c</code>) that will only work for x86 and x64 systems:</p>
+
+<pre class=""lang-c prettyprint-override""><code>double
+fldpi()
+{
+    double pi;
+    asm(""fldpi"" : ""=t"" (pi));
+    return pi;
+}
+</code></pre>
+
+<p>And a build script that builds all the configurations I'm testing (<code>build.sh</code>):</p>
+
+<pre><code>#!/bin/sh
+gcc -O3 -Wall -c           -m32 -o fldpi-32.o fldpi.c
+gcc -O3 -Wall -c           -m64 -o fldpi-64.o fldpi.c
+
+gcc -O3 -Wall -ffast-math  -m32 -o pitimes1-32 pitimes.c fldpi-32.o
+gcc -O3 -Wall              -m32 -o pitimes2-32 pitimes.c fldpi-32.o -lm
+gcc -O3 -Wall -fno-builtin -m32 -o pitimes3-32 pitimes.c fldpi-32.o -lm
+gcc -O3 -Wall -ffast-math  -m64 -o pitimes1-64 pitimes.c fldpi-64.o -lm
+gcc -O3 -Wall              -m64 -o pitimes2-64 pitimes.c fldpi-64.o -lm
+gcc -O3 -Wall -fno-builtin -m64 -o pitimes3-64 pitimes.c fldpi-64.o -lm
+</code></pre>
+
+<p>Apart from testing between various compiler flags (I've compared 32-bit against 64-bit too because the optimizations are different), I've also tried switching the order of the tests around. But still, the <code>atan2(0, -1)</code> version still comes out on top every time.</p>
+",17,531.0,67439,What is the fastest way to get the value of π?,<performance><algorithm><language-agnostic><unix><pi>,24,0.0,Question
+4,45,"i've had no trouble using the bsd sockets api in c++, in gnu/linux. here's the sample program i used:
+
+#include 
+
+int
+main()
+{
+    return af_inet;
+}
+
+
+so my take on this is that z/os is probably the complicating factor here, however, because i've never used z/os before, much less programmed in it, i can't say this definitively. :-p
+",0,25,2008-08-01T12:13:50.207,175,"<p>I'm having issues getting the C sockets API to work properly in C++ on z/OS.</p>
+<p>Although I am including <code>sys/socket.h</code>, I still get compile time errors telling me that <code>AF_INET</code> is not defined.</p>
+<p>Am I missing something obvious, or is this related to the fact that being on z/OS makes my problems much more complicated?</p>
+<p>I discovered that there is an <code>#ifdef</code> that I'm hitting. Apparently z/OS isn't happy unless I define which ""type"" of sockets I'm using with:</p>
+<pre><code>#define _OE_SOCKETS
+</code></pre>
+<p>Now, I personally have no idea what this <code>_OE_SOCKETS</code> is actually for, so if any z/OS sockets programmers are out there (all 3 of you), perhaps you could give me a rundown of how this all works?</p>
+<p>Test App</p>
+<pre><code>#include <sys/socket.h>
+
+int main()
+{
+    return AF_INET;
+}
+</code></pre>
+<p>Compile/Link Output:</p>
+<pre><code>cxx -Wc,xplink -Wl,xplink -o inet_test inet.C
+
+""./inet.C"", line 5.16: CCN5274 (S) The name lookup for ""AF_INET"" did not find a declaration.
+CCN0797(I) Compilation failed for file ./inet.C. Object file not created.
+</code></pre>
+<p>A check of sys/sockets.h does include the definition I need, and as far as I can tell, it is not being blocked by any <code>#ifdef</code> statements.</p>
+<p>I have however noticed it contains the following:</p>
+<pre><code>#ifdef __cplusplus
+  extern ""C"" {
+#endif
+</code></pre>
+<p>which encapsulates basically the whole file? Not sure if it matters.</p>
+",1,1443907.0,15845,How to use the C socket API in C++ on z/OS,<c++><c><sockets><mainframe><zos>,9,0.0,Question
+5,34,"i don't think you have anything to worry about. if system.totalmemory goes down you can relax. it may very well be the os that doesn't reclaim the newly freed memory (in anticipation of the next time flash player will ask for more memory).
+
+try doing something else that is very memory intensive and i'm sure that you'll notice that the memory allocated to flash player will decrease and be used for the other process instead.
+
+as i've understood it, memory management in modern os's isn't intuitive from the perspective of looking at the amounts allocated to each process, or even the total amount allocated.
+
+when i've used my mac for 5 minutes 95% of my 3 gb ram is used, and it will stay that way, it never goes down. that's just the way the os handles memory.
+
+as long as it's not needed elsewhere even processes that have quit still have memory assigned to them (this can make them launch quicker the next time, for example).
+",0,34,2008-08-01T12:30:57.630,96,"<p>How do I forcefully unload a <code>ByteArray</code> from memory using ActionScript 3?</p>
+
+<p>I have tried the following:</p>
+
+<pre><code>// First non-working solution
+byteArray.length = 0;
+byteArray = new ByteArray();
+
+// Second non-working solution
+for ( var i:int=0; i < byteArray.length; i++ ) {
+    byteArray[i] = null;
+}
+</code></pre>
+",0,,11240,How to unload a ByteArray using Actionscript 3?,<arrays><actionscript-3><apache-flex>,8,0.0,Question
+6,40,"to make it more readable and maintainable, you can also split it up into multiple linq statements.
+
+
+first, select your data into a new list, let's call it x1, do a projection if desired
+next, create a distinct list, from x1 into x2, using whatever distinction you require
+finally, create an ordered list, from x2 into x3, sorting by whatever you desire 
+
+",0,59,2008-08-01T13:14:33.797,117,"<p>I have a <code>DataTable</code> with a <code>Name</code> column. I want to generate a collection of the unique names ordered alphabetically. The following query ignores the <em>order by</em> clause.</p>
+
+<pre><code>var names =
+    (from DataRow dr in dataTable.Rows
+    orderby (string)dr[""Name""]
+    select (string)dr[""Name""]).Distinct();
+</code></pre>
+
+<p>Why does the <code>orderby</code> not get enforced?</p>
+",0,43110.0,26917,"How do I get a distinct, ordered list of names from a DataTable using LINQ?",<c#><linq><.net-3.5>,7,0.0,Question
+7,16,"a few things that have bitten me:
+
+
+:main: -- rdoc uses only the last one evaluated; best to make sure there's only one in your project and you don't also use the --main command-line argument.
+same as previous, but for :title:
+:section: doesn't work very well
+
+",0,72,2008-08-01T13:38:27.133,48,"<p>I want to format my existing comments as 'RDoc comments' so they can be viewed using <code>ri</code>.</p>
+
+<p>What are some recommended resources for starting out using RDoc?</p>
+",1,,2089,How do I add existing comments to RDoc in Ruby?,<ruby><rdoc>,2,,Question
+8,63,"maybe. but you have bigger problems. gettimeofday() can result in incorrect timings if there are processes on your system that change the timer (ie, ntpd). on a ""normal"" linux, though, i believe the resolution of gettimeofday() is 10us. it can jump forward and backward and time, consequently, based on the processes running on your system. this effectively makes the answer to your question no.
+
+you should look into clock_gettime(clock_monotonic) for timing intervals. it suffers from several less issues due to things like multi-core systems and external clock settings.
+
+also, look into the clock_getres() function.
+",5,88,2008-08-01T14:36:18.640,106,"<p>I am porting a game, that was originally written for the Win32 API, to Linux (well, porting the OS X port of the Win32 port to Linux).</p>
+
+<p>I have implemented <code>QueryPerformanceCounter</code> by giving the uSeconds since the process start up:     </p>
+
+<pre><code>BOOL QueryPerformanceCounter(LARGE_INTEGER* performanceCount)
+{
+    gettimeofday(&currentTimeVal, NULL);
+    performanceCount->QuadPart = (currentTimeVal.tv_sec - startTimeVal.tv_sec);
+    performanceCount->QuadPart *= (1000 * 1000);
+    performanceCount->QuadPart += (currentTimeVal.tv_usec - startTimeVal.tv_usec);
+
+    return true;
+}
+</code></pre>
+
+<p>This, coupled with <code>QueryPerformanceFrequency()</code> giving a constant 1000000 as the frequency, works well <b>on my machine</b>, giving me a 64-bit variable that contains <code>uSeconds</code> since the program's start-up.</p>
+
+<p>So <em>is this portable?</em> I don't want to discover it works differently if the kernel was compiled in a certain way or anything like that. I am fine with it being non-portable to something other than Linux, however.</p>
+",0,98.0,44472,Is gettimeofday() guaranteed to be of microsecond resolution?,<linux><winapi><visual-c++><unix><timer>,10,0.0,Question
+9,15,"version control with subversion
+
+a very good resource for source control in general. not really tortoisesvn specific, though.
+",0,90,2008-08-01T14:41:24.277,164,"<p>How do you <a href=""http://svnbook.red-bean.com/en/1.8/svn.branchmerge.html"" rel=""noreferrer"">branch and merge</a> with Apache Subversion using the TortoiseSVN client? </p>
+",0,1466832.0,56334,How do you branch and merge with TortoiseSVN?,<svn><tortoisesvn><branch><branching-and-merging>,3,0.0,Question
+10,65,"this has religious war potential, but it seems to me that if you're using a getter/setter, you should use it internally as well - using both will lead to maintenance problems down the road (e.g. somebody adds code to a setter that needs to run every time that property is set, and the property is being set internally w/o that setter being called).
+",3,126,2008-08-01T16:10:30.337,105,"<p>What is the ""purist"" or ""correct"" way to access an object's properties from within an object method that is not a getter/setter method?</p>
+
+<p>I know that from outside of the object you should use a getter/setter, but from within would you just do:</p>
+
+<p>Java:</p>
+
+<pre><code>String property = this.property;
+</code></pre>
+
+<p>PHP:</p>
+
+<pre><code>$property = $this->property;
+</code></pre>
+
+<p>or would you do:</p>
+
+<p>Java:</p>
+
+<pre><code>String property = this.getProperty();
+</code></pre>
+
+<p>PHP:</p>
+
+<pre><code>$property = $this->getProperty();
+</code></pre>
+
+<p>Forgive me if my Java is a little off, it's been a year since I programmed in Java...</p>
+
+<p><strong>EDIT:</strong></p>
+
+<p>It seems people are assuming I am talking about private or protected variables/properties only. When I learned OO I was taught to use getters/setters for every single property even if it was public (and actually I was told never to make any variable/property public). So, I may be starting off from a false assumption from the get go. It appears that people answering this question are maybe saying that you should have public properties and that those don't need getters and setters, which goes against what I was taught, and what I was talking about, although maybe that needs to be discussed as well. That's probably a good topic for a different question though...</p>
+",1,127.0,23701,How would you access Object properties from within an object method?,<java><php><oop><theory>,18,0.0,Question
+11,59,"the best way that i have found is the mysql migration toolkit provided by mysql.  i have used it successfully for some large migration projects.
+",4,129,2008-08-01T16:22:42.420,90,"<p>I've been banging my head against <code>SQL Server 2005</code> trying to get a lot of data out.  I've been given a database with nearly 300 tables in it and I need to turn this into a MySQL database.  My first call was to use bcp but unfortunately it doesn't produce valid CSV - strings aren't encapsulated, so you can't deal with any row that has a string with a comma in it (or whatever you use as a delimiter) and I would still have to hand write all of the create table statements, as obviously CSV doesn't tell you anything about the data types.</p>
+
+<p>What would be better is if there was some tool that could connect to both SQL Server and MySQL, then do a copy. You lose views, stored procedures, trigger, etc, but it isn't hard to copy a table that only uses base types from one DB to another... is it?</p>
+
+<p>Does anybody know of such a tool?  I don't mind how many assumptions it makes or what simplifications occur, as long as it supports integer, float, datetime and string. I have to do a lot of pruning, normalising, etc. anyway so I don't care about keeping keys, relationships or anything like that, but I need the initial set of data in fast!</p>
+",5,,96578,How to export data from SQL Server 2005 to MySQL,<mysql><sql-server><csv><sql-server-2005><bcp>,5,0.0,Question
+12,43,"the funny thing is i wrote a php media gallery for all my musics 2 days ago. i had a similar problem.  i'm using http://musicplayer.sourceforge.net/ for the player. and the playlist is built via php. all music requests go to a script called xfer.php?file=whatever
+$filename = base64_url_decode($_request['file']);
+header(""cache-control: public"");
+header('content-disposition: attachment; filename='.basename($filename));
+header(""content-transfer-encoding: binary"");
+header('content-length: '. filesize($filename));
+
+//  put either file counting code here, either a db or static files
+//
+readfile($filename);  //and spit the user the file
+
+function base64_url_decode($input) {
+    return base64_decode(strtr($input, '-_,', '+/='));
+}
+
+and when you call files use something like:
+function base64_url_encode($input) {
+     return strtr(base64_encode($input), '+/=', '-_,');
+}
+
+http://us.php.net/manual/en/function.base64-encode.php
+if you are using some javascript or a flash player (jw player for example) that requires the actual link of an mp3 file or whatever, you can append the text ""&type=.mp3"" so the final link becomes something like:
+""www.example.com/xfer.php?file=34842ffjfjxfh&type=.mp3"". that way it looks like it ends with an mp3 extension without affecting the file link.
+",6,146,2008-08-01T17:14:58.337,89,"<p>I have a website that plays mp3s in a flash player. If a user clicks 'play' the flash player automatically downloads an mp3 and starts playing it. </p>
+
+<p>Is there an easy way to track how many times a particular song clip (or any binary file) has been downloaded?</p>
+
+<hr>
+
+<blockquote>
+  <p>Is the play link a link to the actual
+  mp3 file or to some javascript code
+  that pops up a player?</p>
+  
+  <p>If the latter, you can easily add your
+  own logging code in there to track the
+  number of hits to it.</p>
+  
+  <p>If the former, you'll need something
+  that can track the web server log
+  itself and make that distinction. My
+  hosting plan comes with Webalizer,
+  which does this nicely.</p>
+</blockquote>
+
+<p>It's a javascript code so that answers that. </p>
+
+<p>However, it would be nice to know how to track downloads using the other method (without switching hosts).</p>
+",0,152.0,21381,How do I track file downloads,<php><apache><logging><download><analytics>,8,0.0,Question
+13,32,"looks like jeff is using cruisecontrol.net based on some leafing through the podcast transcripts. this seems to have automated deployment capabilities from source control to production. might this be where the insertion is happening?
+",2,163,2008-08-01T18:00:13.830,101,"<p>Stack Overflow has a subversion version number at the bottom:</p>
+
+<blockquote>
+  <p>svn revision: 679</p>
+</blockquote>
+
+<p>I want to use such automatic versioning with my <code>.NET Web Site/Application</code>, Windows Forms, WPD projects/solutions.</p>
+
+<p>How do I implement this?</p>
+",3,170.0,9425,How do I sync the SVN revision number with my ASP.NET web site?,<.net><asp.net><svn><versioning>,7,0.0,Question
+14,188,"martin fowler wrote my favorite article on the subject, http://martinfowler.com/articles/evodb.html.  i choose not to put schema dumps in under version control as alumb and others suggest because i want an easy way to upgrade my production database.
+
+for a web application where i'll have a single production database instance, i use two techniques:
+
+database upgrade scripts
+
+a sequence database upgrade scripts that contain the ddl necessary to move the schema from version n to n+1.  (these go in your version control system.)  a _version_history_ table, something like
+
+create table versionhistory (
+    version int primary key,
+    upgradestart datetime not null,
+    upgradeend datetime
+    );
+
+
+gets a new entry every time an upgrade script runs which corresponds to the new version.
+
+this ensures that it's easy to see what version of the database schema exists and that database upgrade scripts are run only once.  again, these are not database dumps.  rather, each script represents the changes necessary to move from one version to the next.  they're the script that you apply to your production database to ""upgrade"" it.
+
+developer sandbox synchronization
+
+
+a script to backup, sanitize, and shrink a production database.  run this after each upgrade to the production db.
+a script to restore (and tweak, if necessary) the backup on a developer's workstation.  each developer runs this script after each upgrade to the production db.
+
+
+a caveat: my automated tests run against a schema-correct but empty database, so this advice will not perfectly suit your needs.
+",8,173,2008-08-01T18:33:08.333,337,"<p>I want to get my databases under version control.</p>
+<p>I'll always want to have at least <em>some</em> data in there (as <a href=""https://stackoverflow.com/users/80/alumb"">alumb</a> mentions: user types and administrators). I'll also often want a large collection of generated test data for performance measurements.</p>
+<p>How would I apply version control to my database?</p>
+",1,516.0,114312,How to do version control for SQL Server database?,<sql-server><database><svn><version-control>,30,0.0,Question
+15,36,"you can print from the command line using the following:
+
+
+  rundll32.exe
+  %windir%\system32\mshtml.dll,printhtml
+  ""%1""
+
+
+where %1 is the file path of the html file to be printed.
+
+if you don't need to print from memory (or can afford to write to the disk in a temp file) you can use:
+
+using (process printprocess = new process())
+{
+    string systempath = environment.getfolderpath(environment.specialfolder.system);
+    printprocess.startinfo.filename = systempath + @""\rundll32.exe"";
+    printprocess.startinfo.arguments = systempath + @""\mshtml.dll,printhtml """""" + filetoprint + @"""""""";
+    printprocess.start();
+}
+
+
+n.b. this only works on windows 2000 and above i think.
+",2,174,2008-08-01T18:33:48.287,86,"<p>I want to print HTML from a C# web service.  The web browser control is overkill, and does not function well in a service environment, nor does it function well on a system with very tight security constraints.  Is there any sort of free <code>.NET</code> library that will support the printing of a basic HTML page?  Here is the code I have so far, which does not run properly.</p>
+
+<pre><code>public void PrintThing(string document)
+{
+    if (Thread.CurrentThread.GetApartmentState() != ApartmentState.STA)
+    {
+        Thread thread =
+            new Thread((ThreadStart) delegate { PrintDocument(document); });
+        thread.SetApartmentState(ApartmentState.STA);
+        thread.Start();
+    }
+    else
+    {
+        PrintDocument(document);
+    }
+}
+
+protected void PrintDocument(string document)
+{
+    WebBrowser browser = new WebBrowser();
+    browser.DocumentText = document;
+    while (browser.ReadyState != WebBrowserReadyState.Complete)
+    {
+        Application.DoEvents();
+    }
+    browser.Print();
+}
+</code></pre>
+
+<p>This works fine when called from UI-type threads, but nothing happens when called from a service-type thread.  Changing <code>Print()</code> to <code>ShowPrintPreviewDialog()</code> yields the following IE script error:</p>
+
+<blockquote>
+  <p><strong>Error:</strong> <code>dialogArguments.___IE_PrintType</code> is null or not an object. </p>
+  
+  <p>URL: <code>res://ieframe.dll/preview.dlg</code></p>
+</blockquote>
+
+<p>And a small empty print preview dialog appears.</p>
+",4,,17297,How do I print an HTML document from a web service?,<c#><html><web-services><printing>,7,0.0,Question
+16,34,"off the top of my head...
+
+$artist = array(""the roots"",""michael jackson"",""billy idol"",""more"",""and more"",""and_yet_more"");
+$count = array(5,3,9,1,1,3);
+$highest = max($count);
+for (int $x = 0; $x < count($artist); $x++)
+{
+    $normalized = $count[$x] / $highest;
+    $heading = ceil($normalized * 6); // 6 heading types
+    echo """".$artist[$x]."""";
+}
+
+",0,227,2008-08-01T21:40:55.833,80,"<p>I have the following arrays:</p>
+
+<pre><code>$artist = array(""the roots"", ""michael jackson"", ""billy idol"", ""more"", ""and more"", ""and_YET_MORE"");
+$count = array(5, 3, 9, 1, 1, 3);
+</code></pre>
+
+<p>I want to generate a tag cloud that will have artists with a higher number in <code>$count</code> enclosed in <code>h6</code> tags and the lowest enclosed <code>h1</code> tags.</p>
+",0,2943318.0,9377,What's the best way to generate a tag cloud from an array using h1 through h6 for sizing?,<php><arrays><tag-cloud>,8,0.0,Question
+17,565,"use:
+
+using system.linq.enumerable;
+...
+list> mylist = adictionary.tolist();
+
+mylist.sort(
+    delegate(keyvaluepair pair1,
+    keyvaluepair pair2)
+    {
+        return pair1.value.compareto(pair2.value);
+    }
+);
+
+
+since you're targeting .net 2.0 or above, you can simplify this into lambda syntax -- it's equivalent, but shorter. if you're targeting .net 2.0 you can only use this syntax if you're using the compiler from visual&nbsp;studio&nbsp;2008 (or above).
+
+var mylist = adictionary.tolist();
+
+mylist.sort((pair1,pair2) => pair1.value.compareto(pair2.value));
+
+",9,289,2008-08-02T00:40:58.200,929,"<p>I often have to sort a dictionary (consisting of keys & values) by value. For example, I have a hash of words and respective frequencies that I want to order by frequency.</p>
+<p>There is a <code>SortedList</code> which is good for a single value (say frequency), that I want to map back to the word.</p>
+<p><a href=""http://msdn.microsoft.com/en-us/library/f7fta44c.aspx"" rel=""noreferrer"">SortedDictionary</a> orders by key, not value. Some resort to a <a href=""http://www.codeproject.com/KB/recipes/lookupcollection.aspx"" rel=""noreferrer"">custom class</a>, but is there a cleaner way?</p>
+",3,298.0,774121,How do you sort a dictionary by value?,<c#><.net><sorting><dictionary>,22,0.0,Question
+18,64,"in ruby on rails, there's a concept of a migration -- a quick script to change the database.
+
+you generate a migration file, which has rules to increase the db version (such as adding a column) and rules to downgrade the version (such as removing a column). each migration is numbered, and a table keeps track of your current db version.
+
+to migrate up, you run a command called ""db:migrate"" which looks at your version and applies the needed scripts. you can migrate down in a similar way.
+
+the migration scripts themselves are kept in a version control system -- whenever you change the database you check in a new script, and any developer can apply it to bring their local db to the latest version.
+",1,308,2008-08-02T01:52:54.653,130,"<p>I often run into the following problem.</p>
+
+<p>I work on some changes to a project that require new tables or columns in the database. I make the database modifications and continue my work. Usually, I remember to write down the changes so that they can be replicated on the live system. However, I don't always remember what I've changed and I don't always remember to write it down.</p>
+
+<p>So, I make a push to the live system and get a big, obvious error that there is no <code>NewColumnX</code>, ugh.</p>
+
+<p>Regardless of the fact that this may not be the best practice for this situation, is there a version control system for databases? I don't care about the specific database technology. I just want to know if one exists. If it happens to work with MS SQL Server, then great.</p>
+",2,360.0,36810,Is there a version control system for database structure changes?,<sql><database><oracle><version-control>,22,0.0,Question
+19,30,"i would be a bit reluctant to use nested classes here.  what if you created an abstract base class for a ""multimedia driver"" to handle the back-end stuff (workhorse), and a separate class for the front-end work?  the front-end class could take a pointer/reference to an implemented driver class (for the appropriate media type and situation) and perform the abstract operations on the workhorse structure.
+
+my philosophy would be to go ahead and make both structures accessible to the client in a polished way, just under the assumption they would be used in tandem.
+
+i would reference something like a qtextdocument in qt.  you provide a direct interface to the bare metal data handling, but pass the authority along to an object like a qtextedit to do the manipulation.
+",0,330,2008-08-02T02:51:36.470,58,"<p>I am working on a collection of classes used for video playback and recording. I have one main class which acts like the public interface, with methods like <code>play()</code>, <code>stop()</code>, <code>pause()</code>, <code>record()</code> etc... Then I have workhorse classes which do the video decoding and video encoding. </p>
+
+<p>I just learned about the existence of nested classes in C++, and I'm curious to know what programmers think about using them. I am a little wary and not really sure what the benefits/drawbacks are, but they seem (according to the book I'm reading) to be used in cases such as mine.</p>
+
+<p>The book suggests that in a scenario like mine, a good solution would be to nest the workhorse classes inside the interface class, so there are no separate files for classes the client is not meant to use, and to avoid any possible naming conflicts? I don't know about these justifications. Nested classes are a new concept to me. Just want to see what programmers think about the issue.</p>
+",0,332.0,4889,Should I use nested classes in this case?,<c++><oop><class><nested-class>,10,,Question
+20,78,"i was glad to find a good conversation on this subject, as i hadn't really given it much thought before.
+in summary, signed is a good general choice - even when you're dead sure all the numbers are positive - if you're going to do arithmetic on the variable (like in a typical for loop case).
+unsigned starts to make more sense when:
+
+you're going to do bitwise things like masks, or
+you're desperate to to take advantage of the sign bit for that extra positive range .
+
+personally, i like signed because i don't trust myself to stay consistent and avoid mixing the two types (like the article warns against).
+",1,336,2008-08-02T03:34:44.763,89,"<p>When is it appropriate to use an unsigned variable over a signed one? What about in a <code>for</code> loop?</p>
+
+<p>I hear a lot of opinions about this and I wanted to see if there was anything resembling a consensus. </p>
+
+<pre><code>for (unsigned int i = 0; i < someThing.length(); i++) {  
+    SomeThing var = someThing.at(i);  
+    // You get the idea.  
+}
+</code></pre>
+
+<p>I know Java doesn't have unsigned values, and that must have been a concious decision on <a href=""https://en.wikipedia.org/wiki/Sun_Microsystems"" rel=""noreferrer"">Sun Microsystems</a>' part. </p>
+",2,339.0,26935,When to use unsigned values over signed ones?,<language-agnostic><types>,5,0.0,Question
+21,352,"use email authentication methods, such as spf, and dkim to prove that your emails and your domain name belong together, and to prevent spoofing of your domain name. the spf website includes a wizard to generate the dns information for your site.
+check your reverse dns to make sure the ip address of your mail server points to the domain name that you use for sending mail.
+make sure that the ip-address that you're using is not on a blacklist
+make sure that the reply-to address is a valid, existing address.
+use the full, real name of the addressee in the to field, not just the email-address (e.g. ""john smith""  ).
+monitor your abuse accounts, such as abuse@yourdomain.example and postmaster@yourdomain.example. that means - make sure that these accounts exist, read what's sent to them, and act on complaints.
+finally, make it really easy to unsubscribe. otherwise, your users will unsubscribe by pressing the spam button, and that will affect your reputation.
+that said, getting hotmail to accept your emails remains a black art.
+",6,371,2008-08-02T08:19:18.260,461,"<p>This is a tricky one and I've always relied on techniques, such as permission-based emails (i.e. only sending to people you have permission to send to) and not using blatantly <em>spamish</em> terminology.</p>
+
+<p>Of late, some of the emails I send out programmatically have started being shuffled into people's spam folder automatically and I'm wondering what I can do about it.</p>
+
+<p>This is despite the fact that these particular emails are not ones that humans would mark as spam, specifically, they are emails that contain license keys that people have paid good money for, so I don't think they're going to consider them spam</p>
+
+<p>I figure this is a big topic in which I am essentially an ignorant simpleton.</p>
+",0,396.0,115424,How do you make sure email you send programmatically is not automatically marked as spam?,<email><email-spam>,24,0.0,Question
+22,53,"this warning is there because java is not actually storing type information at run-time in an object that uses generics.  thus, if object is actually a list, there will be no classcastexception at run-time except until an item is accessed from the list that doesn't match the generic type defined in the variable.  
+
+this can cause further complications if items are added to the list, with this incorrect generic type information.  any code still holding a reference to the list but with the correct generic type information will now have an inconsistent list.  
+
+to remove the warning, try:
+
+list list = (list) object;
+
+
+however, note that you will not be able to use certain methods such as add because the compiler doesn't know if you are trying to add an object of incorrect type.  the above will work in a lot of situations, but if you have to use add, or some similarly restricted method, you will just have to suffer the yellow underline in eclipse (or a suppresswarning annotation).
+",0,382,2008-08-02T08:58:27.540,81,"<p>What is the meaning of the <em>Java warning</em>?</p>
+
+<blockquote>
+  <p>Type safety: The cast from Object to List<Integer> is actually checking against the erased type List</p>
+</blockquote>
+
+<p>I get this warning when I try to cast an Object to a type with generic information, such as in the following code:</p>
+
+<pre><code>Object object = getMyList();
+List<Integer> list = (List<Integer>) object;
+</code></pre>
+",1,384.0,10014,What is the meaning of the type safety warning in certain Java generics casts?,<java><generics><warnings><casting><type-safety>,1,0.0,Question
+23,22,"unfortunately the only api that isn't deprecated is located in the applicationservices framework, which doesn't have a bridge support file, and thus isn't available in the bridge. if you're wanting to use ctypes, you can use atsfontgetfilereference after looking up the atsfontref.
+
+cocoa doesn't have any native support, at least as of 10.5, for getting the location of a font.
+",0,469,2008-08-02T15:11:16.430,48,"<p>I am using the Photoshop's javascript API to find the fonts in a given PSD.</p>
+
+<p>Given a font name returned by the API, I want to find the actual physical font file that font name corresponds to on the disc.</p>
+
+<p>This is all happening in a python program running on OSX so I guess I'm looking for one of:</p>
+
+<ul>
+<li>Some Photoshop javascript</li>
+<li>A Python function</li>
+<li>An OSX API that I can call from python</li>
+</ul>
+",0,3040.0,4610,How can I find the full path to a font from its display name on a Mac?,<python><macos><fonts><photoshop>,6,,Question
+24,9,"using fcgi with ruby is known to be very buggy. 
+
+practically everybody has moved to mongrel for this reason, and i recommend you do the same.
+",0,514,2008-08-02T17:26:39.793,24,"<p>I have a Ruby on Rails Website that makes HTTP calls to an external Web Service.</p>
+
+<p>About once a day I get a SystemExit (stacktrace below) error email where a call to the service has failed.  If I then try the exact same query on my site moments later it works fine.
+It's been happening since the site went live and I've had no luck tracking down what causes it.</p>
+
+<p>Ruby is version 1.8.6 and rails is version 1.2.6.</p>
+
+<p>Anyone else have this problem?</p>
+
+<p>This is the error and stacktrace.</p>
+
+<blockquote>
+  <p>A SystemExit occurred
+  /usr/local/lib/ruby/gems/1.8/gems/rails-1.2.6/lib/fcgi_handler.rb:116:in
+  exit'
+  /usr/local/lib/ruby/gems/1.8/gems/rails-1.2.6/lib/fcgi_handler.rb:116:in
+  exit_now_handler'
+  /usr/local/lib/ruby/gems/1.8/gems/activesupport-1.4.4/lib/active_support/inflector.rb:250:in
+  to_proc' /usr/local/lib/ruby/1.8/net/protocol.rb:133:in call'
+  /usr/local/lib/ruby/1.8/net/protocol.rb:133:in sysread'
+  /usr/local/lib/ruby/1.8/net/protocol.rb:133:in rbuf_fill'
+  /usr/local/lib/ruby/1.8/timeout.rb:56:in timeout'
+  /usr/local/lib/ruby/1.8/timeout.rb:76:in timeout'
+  /usr/local/lib/ruby/1.8/net/protocol.rb:132:in rbuf_fill'
+  /usr/local/lib/ruby/1.8/net/protocol.rb:116:in readuntil'
+  /usr/local/lib/ruby/1.8/net/protocol.rb:126:in readline'
+  /usr/local/lib/ruby/1.8/net/http.rb:2017:in read_status_line'
+  /usr/local/lib/ruby/1.8/net/http.rb:2006:in read_new'
+  /usr/local/lib/ruby/1.8/net/http.rb:1047:in request'
+  /usr/local/lib/ruby/1.8/net/http.rb:945:in request_get'
+  /usr/local/lib/ruby/1.8/net/http.rb:380:in get_response'
+  /usr/local/lib/ruby/1.8/net/http.rb:543:in start'
+  /usr/local/lib/ruby/1.8/net/http.rb:379:in get_response'</p>
+</blockquote>
+",0,519.0,2287,Frequent SystemExit in Ruby when making HTTP calls,<ruby-on-rails><ruby><crash>,4,0.0,Question
+25,18,"absolutely, especially dealing with lots of these permutations/combinations i can definitely see that the first pass would be an issue.
+
+interesting implementation in python, though i wrote a nice one in c and ocaml based on ""algorithm 515"" (see below). he wrote his in fortran as it was common back then for all the ""algorithm xx"" papers, well, that assembly or c. i had to re-write it and make some small improvements to work with arrays not ranges of numbers. this one does random access, i'm still working on getting some nice implementations of the ones mentioned in knuth 4th volume fascicle 2. i'll an explanation of how this works to the reader. though if someone is curious, i wouldn't object to writing something up.
+
+/** [combination c n p x]
+ * get the [x]th lexicographically ordered set of [p] elements in [n]
+ * output is in [c], and should be sizeof(int)*[p] */
+void combination(int* c,int n,int p, int x){
+    int i,r,k = 0;
+    for(i=0;i<p-1;i++){
+        c[i] = (i != 0) ? c[i-1] : 0;
+        do {
+            c[i]++;
+            r = choose(n-c[i],p-(i+1));
+            k = k + r;
+        } while(k < x);
+        k = k - r;
+    }
+    c[p-1] = c[p-2] + x - k;
+}
+
+
+~""algorithm 515: generation of a vector from the lexicographical index""; buckles, b. p., and lybanon, m. acm transactions on mathematical software, vol. 3, no. 2, june 1977.
+",5,561,2008-08-02T21:34:24.223,29,"<p>I would like to test a function with a tuple from a set of fringe cases and normal values. For example, while testing a function which returns <code>true</code> whenever given three lengths that form a valid triangle, I would have specific cases, negative / small / large numbers, values close-to being overflowed, etc.; what is more, main aim is to generate combinations of these values, <em>with</em> or <em>without</em> repetition, in order to get a set of test data.</p>
+
+<pre><code>(inf,0,-1), (5,10,1000), (10,5,5), (0,-1,5), (1000,inf,inf),
+...
+</code></pre>
+
+<blockquote>
+  <p><em>As a note: I actually know the answer to this, but it might be helpful for others, and a challenge for people here! --will post my answer later on.</em></p>
+</blockquote>
+",1,794.0,10951,How to use combinations of sets as test data,<unit-testing><language-agnostic><testing>,5,0.0,Question
+26,24,"that actually sounds like iis's low level. if it is, then you won't be able to write to any file, not just the web.config.
+
+here are the levels from iis's help file:
+
+
+
+
+
+full (internal) - specifies unrestricted permissions. grants the asp.net application permissions to access any resource that is subject to operating system security. all privileged operations are supported.
+
+
+high (web_hightrust.config) - specifies a high level of code access security, which means that the application cannot do any one of the following things by default:
+
+  call unmanaged code.
+  call serviced components.
+  write to the event log.
+  access message queuing service queues.
+  access odbc, oledb, or oracle data sources.
+
+
+medium (web_mediumtrust.config) - specifies a medium level of code access security, which means that, in addition to high trust level restrictions, the asp.net application cannot do any of the following things by default:
+
+access files outside the application directory.
+access the registry.
+make network or web service calls.
+
+
+low (web_lowtrust.config) - specifies a low level of code access security, which means that, in addition to medium trust level restrictions, the application cannot do any of the following things by default:
+
+write to the file system.
+call the assert method.
+
+
+minimal (web_minimaltrust.config) - specifies a minimal level of code access security, which means that the application has only execute permissions.
+
+
+
+
+i would suggest that if you are dead set on having an installer, have it create a web.config in memory that the user can save locally and ftp up afterward.
+",1,562,2008-08-02T21:39:11.733,51,"<p>Uploading my first decently sized web app to my shared host provided me with a fresh set of challenges, by which I mean, sleepless nights. The issue was that I had most certainly not developed my application for medium trust (or had any clue what that was.) </p>
+
+<p>I mitigated all of the issues, save one. </p>
+
+<p>I had written an installer for the admin to be able to specify their connection string and other preferences, but I cannot find a way to write to a web.config in medium trust. Does anyone have a solution, or should I just be putting preferences in another file?</p>
+",1,,4479,How to write to Web.Config in Medium Trust?,<c#><asp.net><medium-trust>,1,0.0,Question
+27,252,"in java, the 'int' type is a primitive, whereas the 'integer' type is an object.
+
+in c#, the 'int' type is the same as system.int32 and is a value type (ie more like the java 'int'). an integer (just like any other value types) can be boxed (""wrapped"") into an object. 
+
+
+
+the differences between objects and primitives are somewhat beyond the scope of this question, but to summarize: 
+
+objects provide facilities for polymorphism, are passed by reference (or more accurately have references passed by value), and are allocated from the heap. conversely, primitives are immutable types that are passed by value and are often allocated from the stack.
+",10,564,2008-08-02T21:47:34.820,269,"<p>I was reading <em><a href=""https://rads.stackoverflow.com/amzn/click/com/1430209879"" rel=""noreferrer"" rel=""nofollow noreferrer"">More Joel on Software</a></em> when I came across <a href=""http://en.wikipedia.org/wiki/Joel_Spolsky"" rel=""noreferrer"">Joel Spolsky</a> saying something about a particular type of programmer knowing the difference between an <code>int</code> and an <code>Integer</code> in Java/C# (Object-Oriented Programming Languages).</p>
+
+<p>So, what is the difference?</p>
+",1,566.0,247710,What is the difference between an int and an Integer in Java and C#?,<c#><java><integer><int>,26,0.0,Question
+28,55,"the canonical way is to use the built-in cursor iterator.
+
+curs.execute('select * from people')
+for row in curs:
+    print row
+
+
+
+
+you can use fetchall() to get all rows at once.
+
+for row in curs.fetchall():
+    print row
+
+
+it can be convenient to use this to create a python list containing the values returned:
+
+curs.execute('select first_name from people')
+names = [row[0] for row in curs.fetchall()]
+
+
+this can be useful for smaller result sets, but can have bad side effects if the result set is large.
+
+
+you have to wait for the entire result set to be returned to
+your client process.
+you may eat up a lot of memory in your client to hold
+the built-up list.
+it may take a while for python to construct and deconstruct the
+list which you are going to immediately discard anyways.
+
+
+
+
+if you know there's a single row being returned in the result set you can call fetchone() to get the single row.
+
+curs.execute('select max(x) from t')
+maxvalue = curs.fetchone()[0]
+
+
+
+
+finally, you can loop over the result set fetching one row at a time.  in general, there's no particular advantage in doing this over using the iterator.
+
+row = curs.fetchone()
+while row:
+    print row
+    row = curs.fetchone()
+
+",2,594,2008-08-03T01:15:08.507,55,"<p>There are several ways to iterate over a result set. What are the tradeoff of each?</p>
+",1,595.0,58127,cx_Oracle: How do I iterate over a result set?,<python><sql><database><oracle><cx-oracle>,3,0.0,Question
+29,383,"another important but subtle difference between procs created with lambda and procs created with proc.new is how they handle the return statement:
+
+
+in a lambda-created proc, the return statement returns only from the proc itself
+in a proc.new-created proc, the return statement is a little more surprising: it returns control not just from the proc, but also from the method enclosing the proc!
+
+
+here's lambda-created proc's return in action. it behaves in a way that you probably expect:
+
+def whowouldwin
+
+  mylambda = lambda {return ""freddy""}
+  mylambda.call
+
+  # mylambda gets called and returns ""freddy"", and execution
+  # continues on the next line
+
+  return ""jason""
+
+end
+
+
+whowouldwin
+#=> ""jason""
+
+
+now here's a proc.new-created proc's return doing the same thing. you're about to see one of those cases where ruby breaks the much-vaunted principle of least surprise:
+
+def whowouldwin2
+
+  myproc = proc.new {return ""freddy""}
+  myproc.call
+
+  # myproc gets called and returns ""freddy"", 
+  # but also returns control from whowhouldwin2!
+  # the line below *never* gets executed.
+
+  return ""jason""
+
+end
+
+
+whowouldwin2         
+#=> ""freddy""
+
+
+thanks to this surprising behavior (as well as less typing), i tend to favor using lambda over proc.new when making procs.
+",8,626,2008-08-03T06:40:54.120,345,"<p>In Ruby 1.8, there are subtle differences between proc/lambda on the one hand, and <code>Proc.new</code> on the other. </p>
+
+<ul>
+<li>What are those differences?</li>
+<li>Can you give guidelines on how to decide which one to choose?</li>
+<li>In Ruby 1.9, proc and lambda are different. What's the deal?</li>
+</ul>
+",3,723.0,82540,"When to use lambda, when to use Proc.new?",<ruby><lambda><proc>,14,0.0,Question
+30,15,"have you tried changing the target cpu to x86 instead of ""any cpu"" in the advanced compiler options? i know that this solves some problems with other oledb providers by forcing the use of the 32-bit version.
+",3,717,2008-08-03T15:07:10.073,31,"<p>I wrote a windows service using VB that read some legacy data from Visual Foxpro Databases to be inserted in SQL 2005. The problem is this use to run fine in Windows server 2003 32-Bits, but the client recently moved to Windows 2003 64-Bits and now the service won't work. I'm getting a message the the VFP .NET OLEdb provider is not found. I researched and everything seems to point out that there is no solution. Any Help, please...</p>
+",0,799.0,11670,Why doesn't VFP .NET OLEdb provider work in 64 bit Windows?,<.net><sql-server-2005><oledb><legacy><visual-foxpro>,3,,Question
+31,1029,"the activator class within the root system namespace is pretty powerful.
+
+there are a lot of overloads for passing parameters to the constructor and such. check out the documentation at: 
+
+
+  http://msdn.microsoft.com/en-us/library/system.activator.createinstance.aspx
+
+
+or (new path)
+
+
+  https://learn.microsoft.com/en-us/dotnet/api/system.activator.createinstance
+
+
+here are some simple examples:
+
+objecttype instance = (objecttype)activator.createinstance(objecttype);
+
+objecttype instance = (objecttype)activator.createinstance(""myassembly"",""mynamespace.objecttype"");
+
+",4,752,2008-08-03T16:29:03.607,896,"<p>One may not always know the <code>Type</code> of an object at compile-time, but may need to create an instance of the <code>Type</code>.  </p>
+
+<p>How do you get a new object instance from a <code>Type</code>?</p>
+",1,755.0,696855,How to create a new object instance from a Type,<c#><.net><performance><reflection><types>,11,0.0,Question
+32,840,"important note: you have to sort your data first.
+
+the part i didn't get is that in the example construction
+groups = []
+uniquekeys = []
+for k, g in groupby(data, keyfunc):
+   groups.append(list(g))    # store group iterator as a list
+   uniquekeys.append(k)
+
+k is the current grouping key, and g is an iterator that you can use to iterate over the group defined by that grouping key. in other words, the groupby iterator itself returns iterators.
+here's an example of that, using clearer variable names:
+from itertools import groupby
+
+things = [(""animal"", ""bear""), (""animal"", ""duck""), (""plant"", ""cactus""), (""vehicle"", ""speed boat""), (""vehicle"", ""school bus"")]
+
+for key, group in groupby(things, lambda x: x[0]):
+    for thing in group:
+        print(""a %s is a %s."" % (thing[1], key))
+    print("""")
+    
+
+this will give you the output:
+
+a bear is a animal.
+a duck is a animal.
+a cactus is a plant.
+a speed boat is a vehicle.
+a school bus is a vehicle.
+
+in this example, things is a list of tuples where the first item in each tuple is the group the second item belongs to.
+the groupby() function takes two arguments: (1) the data to group and (2) the function to group it with.
+here, lambda x: x[0] tells groupby() to use the first item in each tuple as the grouping key.
+in the above for statement, groupby returns three (key, group iterator) pairs - once for each unique key. you can use the returned iterator to iterate over each individual item in that group.
+here's a slightly different example with the same data, using a list comprehension:
+for key, group in groupby(things, lambda x: x[0]):
+    listofthings = "" and "".join([thing[1] for thing in group])
+    print(key + ""s:  "" + listofthings + ""."")
+
+this will give you the output:
+
+animals: bear and duck.
+plants: cactus.
+vehicles: speed boat and school bus.
+
+",15,773,2008-08-03T18:27:09.687,664,"<p>I haven't been able to find an understandable explanation of how to actually use Python's <code>itertools.groupby()</code> function.  What I'm trying to do is this:</p>
+<ul>
+<li>Take a list - in this case, the children of an objectified <code>lxml</code> element</li>
+<li>Divide it into groups based on some criteria</li>
+<li>Then later iterate over each of these groups separately.</li>
+</ul>
+<p>I've reviewed <a href=""https://docs.python.org/3/library/itertools.html#itertools.groupby"" rel=""noreferrer"">the documentation</a>, but I've had trouble trying to apply them beyond a simple list of numbers.</p>
+<p>So, how do I use of <code>itertools.groupby()</code>?  Is there another technique I should be using?  Pointers to good ""prerequisite"" reading would also be appreciated.</p>
+",1,7286.0,421308,How do I use itertools.groupby()?,<python><python-itertools>,15,0.0,Question
