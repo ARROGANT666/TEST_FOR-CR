@@ -3,6 +3,7 @@ import streamlit as st
 import pandas as pd
 import joblib
 import re
+import nltk
 import translators as ts
 from multiprocessing import Pool
 from tqdm import *
